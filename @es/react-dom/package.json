@@ -1,0 +1,10 @@
+{
+    "name": "@es/react-dom",
+    "version": "1.0.0",
+    "description": "",
+    "license": "UNLICENSED",
+    "module": "index.js",
+    "dependencies": {
+        "react-dom": "*"
+    }
+}
