@@ -17,6 +17,7 @@ const rollupPluginReplace = require('rollup-plugin-replace')
 const rollupPluginJson = require('rollup-plugin-json')
 const isNodeBuiltin = require('is-builtin-module')
 const spawn = require('child_process').spawn
+const updateImportMaps = require('./import-maps.js').updateImportMaps
 
 function fromEntries (iterable) {
     return [...iterable].reduce(
@@ -32,19 +33,7 @@ const detectionResults = []
 let spinner = ora('transpiling')
 
 let spinnerHasError = false
-//
-// function showHelp () {
-//     console.log(
-//         `${chalk.bold(
-//             `@pika/web`
-//         )} - Install npm dependencies to run natively on the web.`
-//     )
-//     console.log(`
-//   Options:
-//     --dest            Specify destination directory (default: "web_modules/").
-//     --optimize        Minify installed dependencies.
-// `)
-// }
+
 function formatDetectionResults (skipFailures) {
     return detectionResults
         .map(
@@ -67,14 +56,6 @@ class ErrorWithHint extends Error {
         this.hint = hint
     }
 }
-// Add common, well-used non-esm packages here so that Rollup doesn't die trying to analyze them.
-// const PACKAGES_TO_AUTO_DETECT_EXPORTS = [
-//     path.join('node_modules', 'react', 'index.js'),
-//     path.join('node_modules', 'react-dom', 'index.js'),
-//     path.join('node_modules', 'react-is', 'index.js'),
-//     path.join('node_modules', 'prop-types', 'index.js'),
-//     path.join('node_modules', 'rxjs', 'Rx.js')
-// ]
 function detectExports (filePath) {
     const fileLoc = path.join(cwd, filePath)
     try {
@@ -135,11 +116,6 @@ async function install (
     { destLoc, skipFailures, isOptimized, namedExports }
 ) {
     const knownNamedExports = Object.assign({}, namedExports)
-    // const remotePackageMap = fromEntries(remotePackages)
-    // for (const filePath of PACKAGES_TO_AUTO_DETECT_EXPORTS) {
-    //     knownNamedExports[filePath] =
-    //         knownNamedExports[filePath] || detectExports(filePath) || []
-    // }
     if (arrayOfDeps.length === 0) {
         logError('no dependencies found.')
         return
@@ -246,8 +222,10 @@ async function install (
         chunkFileNames: 'common/[name]-[hash].js'
     }
     const packageBundle = await rollup.rollup(inputOptions)
-    await packageBundle.write(outputOptions)
-    return true
+    const wr = await packageBundle.write(outputOptions)
+    return wr.output
+        .map(m => m.fileName)
+        .filter(name => !name.startsWith('common'))
 }
 
 async function webModules (optimize = false, dest = 'web_modules') {
@@ -262,6 +240,7 @@ async function webModules (optimize = false, dest = 'web_modules') {
         webDependencies || Object.keys(pkgManifest.dependencies || {})
     spinner.start()
     const startTime = Date.now()
+    console.log(arrayOfDeps)
     const result = await install(arrayOfDeps, {
         destLoc,
         namedExports,
@@ -282,6 +261,7 @@ async function webModules (optimize = false, dest = 'web_modules') {
         spinner.warn(chalk(`Finished with warnings.`))
         process.exitCode = 1
     }
+    return result
 }
 
 function exe (op, argz, options) {
@@ -319,9 +299,12 @@ function esOverlay () {
     )
 }
 
+function importMaps () {}
+
 async function run () {
     await esOverlay().catch(console.error)
-    await webModules().catch(console.error)
+    const results = await webModules().catch(console.error)
+    await updateImportMaps(results)
 }
 
 run()
