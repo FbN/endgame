@@ -38,10 +38,11 @@ function updatePacakgeJson (name = '') {
     name || err('Invalid name')
     const pkgPath = 'package.json'
     const pkg = JSON.parse(fs.readFileSync(pkgPath))
+    const namespacedName = '@es/' + name
     'webmodules' in pkg || (pkg.webmodules = {})
     'webDependencies' in pkg.webmodules || (pkg.webmodules.webDependencies = [])
-    pkg.webmodules.webDependencies.includes(name) ||
-        pkg.webmodules.webDependencies.push(name)
+    pkg.webmodules.webDependencies.includes(namespacedName) ||
+        pkg.webmodules.webDependencies.push(namespacedName)
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, indent))
 }
 
@@ -65,9 +66,14 @@ function makeOverlay (name = '', overwrite = false) {
         )
 }
 
+function addPackage (name = '', overwrite = false) {
+    makeOverlay(name, overwrite)
+    updatePacakgeJson(name)
+}
+
 argv.pkg ||
     console.log(
         'Please specify package name with --pkg <pkg-name>\n' +
             'If you want to overwrite existing files add --force\n'
     )
-argv.pkg && makeOverlay(argv.pkg, 'force' in argv)
+argv.pkg && addPackage(argv.pkg, 'force' in argv)

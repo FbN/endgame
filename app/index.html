@@ -8,10 +8,14 @@
         <script type="importmap">
             {
               "imports": {
-                "@cycle/run": ["/web_modules/@cycle/run.js"]
+                "react": ["/web_modules/@es/react.js"],
+                "react-dom": ["/web_modules/@es/react-dom.js"]
               }
             }
         </script>
     </head>
-    <body id="app"><script type="module" src="js/index.js"></script></body>
+    <body>
+        <div id="app"></div>
+        <script type="module" src="js/index.js"></script>
+    </body>
 </html>

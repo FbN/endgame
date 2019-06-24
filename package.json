@@ -5,8 +5,10 @@
         "react-dom": "^16.8.6"
     },
     "devDependencies": {
+        "browser-sync": "^2.26.7",
         "chalk": "^2.4.2",
-        "eslint": "^5.12.1",
+        "connect-history-api-fallback": "^1.6.0",
+        "eslint": "^6.0.0",
         "eslint-config-standard": "^12.0.0",
         "eslint-plugin-import": "^2.14.0",
         "eslint-plugin-node": "^9.0.1",
@@ -28,11 +30,13 @@
     },
     "webmodules": {
         "webDependencies": [
-            "@es/react"
+            "@es/react",
+            "@es/react-dom"
         ]
     },
     "scripts": {
         "web-modules": "node ./scripts/web-modules.js",
-        "overlay": "node ./scripts/overlay.js"
+        "overlay": "node ./scripts/overlay.js",
+        "serve": "node ./scripts/serve.js"
     }
 }
