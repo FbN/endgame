@@ -2,6 +2,8 @@
 
 No transpilation during frontend development experiment
 
+[Article about this project on Medium](https://medium.com/@ftaioli/bye-bye-transpile-3e4413f7f590?source=friends_link&sk=37ee211bc55f822685873e8185b2e276)
+
 # SCRIPTS
 
 ## overlay
