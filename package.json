@@ -32,7 +32,7 @@
         "rollup-plugin-replace": "^2.1.0",
         "rollup-plugin-terser": "^5.1.1",
         "yargs": "^13.2.4",
-        "yargs-parser": "^13.0.0"
+        "yargs-parser": "^13.1.2"
     },
     "webmodules": {
         "webDependencies": [
